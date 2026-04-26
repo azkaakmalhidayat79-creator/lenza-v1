@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link rel="stylesheet" href="LENZA V2.CSS">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Azkan — Creative Developer</title>
+<meta name="description" content="Creative developer portfolio with cinematic storytelling, 3D interaction, and premium UX." />
+
+<!-- OG -->
+<meta property="og:title" content="Azka — Creative Developer" />
+<meta property="og:description" content="Interactive portfolio experience." />
+<meta property="og:type" content="website" />
+
+<!-- Perf hints -->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.6/bundled/lenis.min.js"></script>
+
+<style>
+:root{--bg:#000;--text:#fff;--muted:#a1a1aa;--brand:#0071e3}
+body.light{--bg:#f5f5f7;--text:#111;--muted:#555}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:var(--bg);color:var(--text);cursor:none;overflow-x:hidden}
+
+canvas{position:fixed;top:0;left:0;z-index:-2}
+
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--brand);width:0;z-index:2000}
+
+.cursor,.cursor-follower{position:fixed;border-radius:50%;pointer-events:none;z-index:2000}
+.cursor{width:8px;height:8px;background:var(--text)}
+.cursor-follower{width:36px;height:36px;border:1px solid var(--text);opacity:.6}
+.cursor-text{position:fixed;font-size:12px;z-index:2001}
+
+nav{position:fixed;top:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;z-index:1000}
+.nav-links a{margin:0 10px;color:var(--text);text-decoration:none;opacity:.8}
+.nav-links a:hover{opacity:1}
+.toggle{background:var(--brand);color:#fff;border:none;padding:8px 14px;border-radius:20px}
+
+section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:100px 20px}
+
+h1{font-size:clamp(2.4rem,6vw,4rem);max-width:900px;letter-spacing:-0.02em}
+p{color:var(--muted);margin-top:10px;max-width:720px}
+
+/* SPLIT TEXT */
+.split span{display:inline-block;opacity:0;transform:translateY(40px)}
+
+/* PARALLAX LAYER */
+.layer{position:absolute;width:200%;height:200%;background:radial-gradient(circle at 30% 30%,#0071e311,transparent 40%);z-index:-1}
+
+/* PIN SECTION */
+.pin{height:320vh;position:relative}
+.sticky{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+
+/* GRID PROJECTS */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:min(1100px,90%);margin-top:30px}
+.card{width:100%;height:200px;background:rgba(255,255,255,0.05);border-radius:20px;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d}
+.card small{opacity:.7}
+
+/* VIDEO */
+.video-thumb{width:min(560px,90%);border-radius:20px;overflow:hidden;cursor:pointer;position:relative}
+.video-thumb video{width:100%;display:block}
+.video-thumb::after{content:"▶";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;opacity:.85}
+
+.modal{position:fixed;inset:0;background:var(--bg);display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none}
+.modal video{width:min(1000px,90%);border-radius:20px}
+
+.btn{margin-top:20px;padding:12px 25px;border-radius:30px;background:var(--brand);color:#fff;cursor:pointer}
+
+footer{padding:40px 20px;text-align:center;color:var(--muted)}
+
+/* Responsive */
+@media(max-width:900px){
+ .grid{grid-template-columns:1fr}
+ body{cursor:auto}
+ .cursor,.cursor-follower,.cursor-text{display:none}
+}
+
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<canvas id="bg"></canvas>
+<div class="layer" id="layer"></div>
+
+<div class="cursor"></div>
+<div class="cursor-follower"></div>
+<div class="cursor-text" id="cursorText"></div>
+
+<nav>
+<div><b>My Portofolio</b></div>
+<div class="nav-links">
+ <a href="#home">Home</a>
+ <a href="#about">About</a>
+ <a href="#work">Work</a>
+ <a href="#contact">Contact</a>
+</div>
+<button class="toggle" onclick="toggleMode()">Mode</button>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+<h1 class="split" id="hero">This is not a portfolio. This is experience.</h1>
+<p>Creative developer focused on cinematic UI & interaction.</p>
+<div class="btn" id="magnet">Explore</div>
+</section>
+
+<!-- STORY -->
+<section class="pin">
+<div class="sticky">
+<h1 id="storyText">Selamat Menikmati.</h1>
+<p>Scroll pelan...</p>
+</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+<h1>About</h1>
+<p>Hallo, Perkenalkan Saya Muhammad Azka Akmal Hidayat. Seorang Siswa Kelas XI  Yang sedang belajar membangun pengalaman web dengan fokus pada motion, detail, dan performa. Stack: HTML, CSS, JS, GSAP, WebGL.</p>
+</section>
+
+<!-- WORK -->
+<section id="work">
+<h1>Selected Work</h1>
+<div class="grid">
+
+  <div class="project-item">
+       <img src="GFX1.jpg" alt="Project 01">
+       Project 01<br><small>Model GFX</small>
+      </div>
+
+  <div class="project-item02">
+       <img src="GFX 2.jpeg" alt="Project 02">
+       Project 02<br><small>Model GFX</small>
+      </div>
+
+  <div class="project-item03">
+       <img src="GFX 3.jpeg" alt="Project 03">
+       Project 03<br><small>Model GFX</small>
+      </div>
+
+
+</div>
+</section>
+
+<!-- VIDEO -->
+<section>
+<h1>Project Preview</h1>
+<div class="video-thumb" id="thumb">
+<video muted loop preload="metadata" src="AMV V1.mp4"></video>
+</div>
+</section>  
+
+<div class="modal" id="modal" aria-hidden="true">
+<video id="player" src="AMV V1.mp4" controls></video>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+<h1>Contact</h1>
+<p>Email: azkakmal.hidayat79@email.com · GitHub: github.com/dayattohh · IG: @ellenhwaa</p>
+</section>
+
+<section id="Special Thanks For">
+<h1>Special Thanks For</h1>
+<p>Allah -  My mom - Teacher - Ayeesha - Freinds - Mas Rafiki</p>
+</section>
+
+<footer>© 2026 Lenza — Built with GSAP, Three.js</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// LENIS
+const lenis=new Lenis({smooth:true});
+function raf(time){lenis.raf(time);requestAnimationFrame(raf)}
+requestAnimationFrame(raf);
+lenis.on('scroll',ScrollTrigger.update);
+
+// PROGRESS
+window.addEventListener('scroll',()=>{
+ let h=document.body.scrollHeight-window.innerHeight;
+ document.getElementById('progress').style.width=(window.scrollY/h*100)+'%';
+});
+
+// DARK MODE
+function toggleMode(){document.body.classList.toggle('light')}
+
+// THREE INTERACTIVE
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('bg'),alpha:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshBasicMaterial({wireframe:true}));
+scene.add(mesh);camera.position.z=3;
+
+document.addEventListener('mousemove',e=>{
+ mesh.rotation.x=e.clientY*0.0005;
+ mesh.rotation.y=e.clientX*0.0005;
+});
+
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}
+animate();
+
+// CURSOR
+const c=document.querySelector('.cursor');
+const f=document.querySelector('.cursor-follower');
+const t=document.getElementById('cursorText');
+document.addEventListener('mousemove',e=>{
+ gsap.to(c,{x:e.clientX,y:e.clientY});
+ gsap.to(f,{x:e.clientX,y:e.clientY,duration:0.3});
+ gsap.to(t,{x:e.clientX,y:e.clientY});
+});
+
+// MAGNET
+const btn=document.getElementById('magnet');
+btn.addEventListener('mousemove',e=>{
+ const r=btn.getBoundingClientRect();
+ btn.style.transform=`translate(${(e.clientX-r.left-r.width/2)*0.3}px,${(e.clientY-r.top-r.height/2)*0.3}px)`;
+});
+btn.addEventListener('mouseleave',()=>btn.style.transform='translate(0,0)');
+
+// SPLIT TEXT
+const hero=document.getElementById('hero');
+const words=hero.innerText.split(' ');
+hero.innerHTML=words.map(w=>`<span>${w}</span>`).join(' ');
+
+gsap.to('#hero span',{opacity:1,y:0,stagger:0.08,duration:0.8});
+
+// STORY TEXT
+const texts=['Design.','Interaction.','Emotion.','Experience.'];
+let current=0;
+ScrollTrigger.create({
+ trigger:'.pin',start:'top top',end:'bottom bottom',scrub:true,
+ onUpdate:self=>{
+  let i=Math.floor(self.progress*texts.length);
+  if(i!==current && i<texts.length){
+    current=i;
+    gsap.to('#storyText',{opacity:0,onComplete:()=>{
+      storyText.innerText=texts[i];
+      gsap.fromTo('#storyText',{opacity:0,y:40},{opacity:1,y:0});
+    }});
+  }
+ }
+});
+
+// PARALLAX
+gsap.to('#layer',{y:200,scrollTrigger:{scrub:true}});
+
+// 3D CARDS
+const cards=document.querySelectorAll('.card');
+cards.forEach(card=>{
+ card.addEventListener('mousemove',e=>{
+  const r=card.getBoundingClientRect();
+  card.style.transform=`rotateX(${-(e.clientY-r.top-r.height/2)/10}deg) rotateY(${(e.clientX-r.left-r.width/2)/10}deg)`;
+ });
+ card.addEventListener('mouseleave',()=>card.style.transform='rotateX(0) rotateY(0)');
+});
+
+// VIDEO
+const thumb=document.getElementById('thumb');
+const vid=thumb.querySelector('video');
+thumb.addEventListener('mouseenter',()=>{vid.play();t.innerText='VIEW'});
+thumb.addEventListener('mouseleave',()=>{vid.pause();vid.currentTime=0;t.innerText=''});
+
+// MODAL
+const modal=document.getElementById('modal');
+const player=document.getElementById('player');
+thumb.onclick=()=>{gsap.to(modal,{opacity:1,pointerEvents:'auto'});player.play()};
+modal.onclick=()=>{gsap.to(modal,{opacity:0,pointerEvents:'none'});player.pause();player.currentTime=0};
+
+// SCROLL
+ScrollTrigger.refresh();
+</script>
+
+</body>
+</html>
